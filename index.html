@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault Messenger | Secure Privacy Layer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #22d3ee;
+            --bg: #020617;
+        }
+        body {
+            background: radial-gradient(circle at 0% 0%, #083344 0%, #020617 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(34, 211, 238, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .input-focus:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+        }
+        .animate-glow {
+            animation: glow 3s infinite alternate;
+        }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 2px var(--primary)); }
+            to { filter: drop-shadow(0 0 10px var(--primary)); }
+        }
+        /* Stealth Mode Style */
+        .stealth-active {
+            -webkit-text-security: disc;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-lg glass rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden">
+        
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl"></div>
+
+        <div class="flex flex-col items-center mb-10">
+            <div class="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center border border-cyan-500/30 animate-glow mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tighter italic">VAULT <span class="text-cyan-400">MESSENGER</span></h1>
+            <p class="text-[10px] tracking-[0.4em] font-bold text-slate-500 uppercase mt-2 text-center">Protocol V1.0 • End-to-End Obfuscation</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
+                <label class="text-[10px] font-black text-cyan-500/70 uppercase mb-2 block">Cipher Key</label>
+                <input type="number" id="shiftKey" value="7" min="0" max="25" 
+                       class="bg-transparent w-full text-2xl font-bold outline-none text-white">
+            </div>
+            <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col justify-center cursor-pointer hover:border-cyan-500/50 transition-all" onclick="toggleStealth()">
+                <label class="text-[10px] font-black text-slate-500 uppercase mb-1 block">Stealth Input</label>
+                <div id="stealthStatus" class="text-sm font-bold text-slate-400 uppercase tracking-widest">Disabled</div>
+            </div>
+        </div>
+
+        <div class="relative mb-6">
+            <textarea id="userInput" placeholder="Enter your secret message..." 
+                      class="w-full bg-slate-900/80 border border-slate-800 rounded-3xl p-6 h-40 outline-none input-focus transition-all text-slate-200 resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <button onclick="process('encrypt')" class="group relative overflow-hidden bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black py-5 rounded-2xl transition-all shadow-lg shadow-cyan-500/20">
+                <span class="relative z-10">ENCRYPT</span>
+            </button>
+            <button onclick="process('decrypt')" class="bg-slate-800 hover:bg-slate-700 text-white font-black py-5 rounded-2xl border border-slate-700 transition-all">
+                DECRYPT
+            </button>
+        </div>
+
+        <div id="resultWrapper" class="hidden animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div class="bg-cyan-950/20 border border-cyan-500/20 rounded-3xl p-6 relative">
+                <div class="flex justify-between items-center mb-4">
+                    <span id="resultLabel" class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Result</span>
+                    <button onclick="copyResult()" class="text-[10px] bg-cyan-400 text-slate-950 px-3 py-1 rounded-full font-bold hover:bg-white transition-all">COPY</button>
+                </div>
+                <p id="resultDisplay" class="text-xl font-medium text-white leading-relaxed break-words"></p>
+                
+                <div class="mt-6 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                    <div id="timerBar" class="h-full bg-cyan-400 w-full"></div>
+                </div>
+                <p class="text-[9px] text-slate-500 mt-2 text-center uppercase tracking-widest">Self-destructing in 30s</p>
+            </div>
+        </div>
+
+        <footer class="mt-12 pt-8 border-t border-slate-800/50 flex flex-col items-center">
+            <p class="text-[11px] text-slate-500 font-medium">Developed by</p>
+            <a href="mailto:manis.programmer@gmail.com" class="text-cyan-400 text-sm font-bold hover:text-cyan-300 transition-colors">manis.programmer@gmail.com</a>
+            <div class="flex gap-4 mt-6">
+                <span class="text-[8px] px-2 py-1 bg-slate-800 rounded text-slate-400 font-bold uppercase tracking-widest">Solana Ecosystem</span>
+                <span class="text-[8px] px-2 py-1 bg-slate-800 rounded text-slate-400 font-bold uppercase tracking-widest">Web 4.0 Ready</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let stealthMode = false;
+        let countdown;
+
+        function toggleStealth() {
+            stealthMode = !stealthMode;
+            const input = document.getElementById('userInput');
+            const status = document.getElementById('stealthStatus');
+            if(stealthMode) {
+                input.classList.add('stealth-active');
+                status.innerText = "Active";
+                status.classList.replace('text-slate-400', 'text-cyan-400');
+            } else {
+                input.classList.remove('stealth-active');
+                status.innerText = "Disabled";
+                status.classList.replace('text-cyan-400', 'text-slate-400');
+            }
+        }
+
+        function runCaesar(text, shift) {
+            return text.split('').map(char => {
+                if (char.match(/[a-z]/i)) {
+                    const code = char.charCodeAt(0);
+                    const start = code >= 65 && code <= 90 ? 65 : 97;
+                    return String.fromCharCode(((code - start + shift) % 26 + 26) % 26 + start);
+                }
+                return char;
+            }).join('');
+        }
+
+        function process(mode) {
+            const text = document.getElementById('userInput').value;
+            let key = parseInt(document.getElementById('shiftKey').value) || 0;
+            if(!text) return;
+
+            if(mode === 'decrypt') key = -key;
+            const result = runCaesar(text, key);
+
+            const wrapper = document.getElementById('resultWrapper');
+            const display = document.getElementById('resultDisplay');
+            const label = document.getElementById('resultLabel');
+            const bar = document.getElementById('timerBar');
+
+            display.innerText = result;
+            label.innerText = mode + "ed Message";
+            wrapper.classList.remove('hidden');
+
+            // Reset Animation & Timer
+            clearInterval(countdown);
+            bar.style.transition = 'none';
+            bar.style.width = '100%';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width 30s linear';
+                bar.style.width = '0%';
+            }, 50);
+
+            countdown = setTimeout(() => {
+                wrapper.classList.add('hidden');
+                display.innerText = "";
+            }, 30000);
+        }
+
+        function copyResult() {
+            const text = document.getElementById('resultDisplay').innerText;
+            navigator.clipboard.writeText(text);
+            const btn = event.target;
+            btn.innerText = "COPIED!";
+            setTimeout(() => btn.innerText = "COPY", 2000);
+        }
+    </script>
+</body>
+</html>
